@@ -1,0 +1,207 @@
+/* Plain, Simple, Clean Professional Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg-main: #0d1117;
+  --bg-surface: #161b22;
+  --bg-card: #1c2128;
+  --bg-card-hover: #22272e;
+  --border-color: #30363d;
+  --border-muted: #21262d;
+  
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  
+  --success: #3fb950;
+  --warning: #d29922;
+  --danger: #f85149;
+  
+  --radius: 6px;
+  --radius-lg: 8px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+/* Panels & Cards - Clean, Flat, Bordered (No Neon, No Glow) */
+.glass-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+  transition: border-color 0.15s ease;
+}
+
+.glass-panel:hover {
+  border-color: #444c56;
+}
+
+/* Clean Metric Box - Plain & Simple */
+.score-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid var(--score-color, var(--border-color));
+  background: var(--bg-card);
+  margin-bottom: 6px;
+}
+
+.score-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--score-color, var(--text-primary));
+}
+
+/* Clean Code Snippet Box */
+.code-box {
+  background: #0d1117;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: #c9d1d9;
+  font-size: 0.8rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+/* Tab Navigation - Clean GitHub / Linear style underline tabs */
+.tab-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.tab-btn.active {
+  color: #ffffff;
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  font-weight: 600;
+}
+
+/* Clean Buttons */
+.btn-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-card-hover);
+  border-color: #444c56;
+}
+
+/* Spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-fast {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Clean Data Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.75rem;
+}
+
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-muted);
+  font-size: 0.8125rem;
+}
+
+tr:hover td {
+  background: var(--bg-card);
+}

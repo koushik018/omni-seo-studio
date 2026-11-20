@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniSEO - Web Crawler &amp; Search Audit</title>
+  <meta name="description" content="Fast, reliable audit tool for search engine crawlers and modern AI bots. Tests JavaScript rendering, target keywords, metadata, and structured data.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="text-[#f0f6fc] flex flex-col min-h-screen bg-[#0d1117]">
+
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-[#30363d] bg-[#161b22] sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded bg-[#21262d] border border-[#30363d] flex items-center justify-center text-[#f0f6fc]">
+          <i data-lucide="shield" class="w-4 h-4 text-blue-400"></i>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-base tracking-tight text-white">OmniSEO</span>
+          <span class="text-xs text-[#8b949e] border-l border-[#30363d] pl-2 hidden sm:inline">Search &amp; Crawler Audit</span>
+        </div>
+      </div>
+
+      <!-- Quick Sample Buttons -->
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-[#8b949e] hidden sm:inline">Examples:</span>
+        <button onclick="setSampleUrl('https://python.org')" class="btn-secondary">python.org</button>
+        <button onclick="setSampleUrl('https://github.com')" class="btn-secondary">github.com</button>
+        <button onclick="setSampleUrl('https://wikipedia.org')" class="btn-secondary">wikipedia.org</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-grow w-full space-y-6">
+
+    <!-- Search / Audit Input Card -->
+    <section class="glass-panel p-5 sm:p-6 border border-[#30363d]">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-white">Audit Website or HTML Code</h2>
+        <p class="text-xs text-[#8b949e] mt-0.5">Test 14 search and AI crawlers, JavaScript rendering fallbacks, target keywords, and structured data.</p>
+      </div>
+
+      <!-- Audit Input Mode Selector Tabs -->
+      <div class="flex items-center gap-2 mb-4 border-b border-[#21262d] pb-2.5">
+        <button type="button" id="modeBtn-url" onclick="setAuditMode('url')" class="px-3 py-1.5 rounded bg-[#21262d] text-white border border-[#30363d] flex items-center gap-1.5 text-xs font-medium transition">
+          <i data-lucide="globe" class="w-3.5 h-3.5 text-blue-400"></i> 1. Website URL
+        </button>
+        <button type="button" id="modeBtn-upload" onclick="setAuditMode('upload')" class="px-3 py-1.5 rounded text-[#8b949e] hover:text-white border border-transparent flex items-center gap-1.5 text-xs font-medium transition">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i> 2. Upload File
+        </button>
+        <button type="button" id="modeBtn-paste" onclick="setAuditMode('paste')" class="px-3 py-1.5 rounded text-[#8b949e] hover:text-white border border-transparent flex items-center gap-1.5 text-xs font-medium transition">
+          <i data-lucide="file-code" class="w-3.5 h-3.5"></i> 3. Paste HTML
+        </button>
+      </div>
+
+      <!-- Mode 1: URL Form -->
+      <form id="auditForm" onsubmit="handleAuditSubmit(event)" class="space-y-3">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="relative md:col-span-7">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8b949e]">
+              <i data-lucide="globe" class="w-4 h-4"></i>
+            </div>
+            <input 
+              type="text" 
+              id="urlInput" 
+              placeholder="https://example.com or github.com" 
+              required 
+              class="w-full pl-9 pr-3 py-2 bg-[#0d1117] border border-[#30363d] rounded text-[#f0f6fc] placeholder-[#6e7681] text-sm focus:outline-none focus:border-blue-500 transition"
+            >
+          </div>
+          <div class="relative md:col-span-5">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#8b949e]">
+              <i data-lucide="target" class="w-4 h-4"></i>
+            </div>
+            <input 
+              type="text" 
+              id="targetKeywordInput" 
+              placeholder="Target Keyword (e.g. developer platform)" 
+              class="w-full pl-9 pr-3 py-2 bg-[#0d1117] border border-[#30363d] rounded text-[#f0f6fc] placeholder-[#6e7681] text-sm focus:outline-none focus:border-blue-500 transition"
+            >
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <span class="text-xs text-[#8b949e] hidden sm:inline">Probes 14 search &amp; AI crawlers concurrently with fast timeouts.</span>
+          <button 
+            type="submit" 
+            id="auditBtn" 
+            class="btn-primary"
+          >
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+            <span>Run Audit</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Mode 2: Upload File Form -->
+      <form id="uploadForm" onsubmit="handleUploadSubmit(event)" class="hidden space-y-3">
+        <div class="p-6 border border-dashed border-[#30363d] rounded bg-[#0d1117] hover:border-[#444c56] transition text-center cursor-pointer" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" accept=".html,.htm,.txt" onchange="handleFileSelected(event)" class="hidden">
+          <div class="flex flex-col items-center justify-center pointer-events-none">
+            <i data-lucide="upload" class="w-6 h-6 text-[#8b949e] mb-2"></i>
+            <span class="text-sm font-medium text-white" id="fileNameDisplay">Select an HTML File (.html, .htm)</span>
+            <span class="text-xs text-[#8b949e] mt-0.5">Instant local audit before deploying to production</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input 
+            type="text" 
+            id="uploadDomainInput" 
+            placeholder="Canonical URL (e.g. https://example.com/app)" 
+            class="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded text-[#f0f6fc] placeholder-[#6e7681] text-sm focus:outline-none focus:border-blue-500"
+          >
+          <input 
+            type="text" 
+            id="uploadKeywordInput" 
+            placeholder="Target Keyword (optional)" 
+            class="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded text-[#f0f6fc] placeholder-[#6e7681] text-sm focus:outline-none focus:border-blue-500"
+          >
+        </div>
+        <div class="flex justify-end">
+          <button 
+            type="submit" 
+            id="uploadBtn" 
+            class="btn-primary"
+          >
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <span>Audit File</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Mode 3: Paste Raw HTML Form -->
+      <form id="pasteForm" onsubmit="handlePasteSubmit(event)" class="hidden space-y-3">
+        <textarea 
+          id="rawHtmlInput" 
+          rows="5" 
+          placeholder="Paste your <!DOCTYPE html> source code here..." 
+          required 
+          class="w-full p-3 font-mono text-xs bg-[#0d1117] border border-[#30363d] rounded text-[#f0f6fc] placeholder-[#6e7681] focus:outline-none focus:border-blue-500"
+        ></textarea>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input 
+            type="text" 
+            id="pasteDomainInput" 
+            placeholder="Canonical URL (e.g. https://example.com/page)" 
+            class="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded text-[#f0f6fc] placeholder-[#6e7681] text-sm focus:outline-none focus:border-blue-500"
+          >
+          <input 
+            type="text" 
+            id="pasteKeywordInput" 
+            placeholder="Target Keyword (optional)" 
+            class="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded text-[#f0f6fc] placeholder-[#6e7681] text-sm focus:outline-none focus:border-blue-500"
+          >
+        </div>
+        <div class="flex justify-end">
+          <button 
+            type="submit" 
+            id="pasteBtn" 
+            class="btn-primary"
+          >
+            <i data-lucide="code" class="w-3.5 h-3.5"></i>
+            <span>Audit Code</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="hidden py-12 text-center">
+      <div class="inline-flex flex-col items-center justify-center p-6 glass-panel border border-[#30363d] max-w-sm w-full">
+        <div class="w-7 h-7 rounded-full border-2 border-[#30363d] border-t-blue-500 animate-spin-fast mb-3"></div>
+        <h3 class="text-sm font-semibold text-white mb-0.5">Auditing Website</h3>
+        <p class="text-xs text-[#8b949e] font-mono" id="loadingBotText">Dispatching crawlers...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden p-4 rounded bg-[#f85149]/10 border border-[#f85149]/30 text-[#f85149] flex items-start gap-3 text-xs">
+      <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+      <div>
+        <h4 class="font-semibold text-sm" id="errorTitle">Audit Encountered an Issue</h4>
+        <p class="text-[#f85149]/80 mt-0.5" id="errorMsg"></p>
+      </div>
+    </div>
+
+    <!-- Audit Results Workspace -->
+    <div id="resultsContainer" class="hidden space-y-5">
+
+      <!-- URL Status Header Card -->
+      <div class="glass-panel p-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded bg-[#21262d] border border-[#30363d] flex items-center justify-center text-[#3fb950]" id="statusBadge">
+            <i data-lucide="check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#21262d] text-white" id="statusCodeText">HTTP 200</span>
+              <a id="auditedUrlLink" href="#" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-white hover:text-blue-400 flex items-center gap-1 transition">
+                <span id="auditedUrlDisplay">https://example.com</span>
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </div>
+            <p class="text-xs text-[#8b949e] mt-0.5 flex items-center gap-2">
+              <span>Audited at <strong class="text-[#c9d1d9]" id="auditTimestamp">Just now</strong></span>
+              <span>&bull;</span>
+              <span id="headerCdnBadge" class="text-[#c9d1d9]">CDN: Checking...</span>
+              <span>&bull;</span>
+              <span id="headerLatencyBadge" class="text-[#c9d1d9]">TTFB: 0ms</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="downloadAutoFixedHtml()" class="btn-primary text-xs">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> ⚡ 100/100 HTML
+          </button>
+          <button onclick="openAiExportModal('claude')" class="btn-secondary text-xs">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-blue-400"></i> Claude Prompt
+          </button>
+          <button onclick="openAiExportModal('deepseek')" class="btn-secondary text-xs">
+            <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-400"></i> DeepSeek Prompt
+          </button>
+          <button onclick="openCanvasFallbackModal()" class="btn-secondary text-xs">
+            <i data-lucide="box" class="w-3.5 h-3.5 text-purple-400"></i> 3D Canvas SEO
+          </button>
+          <button onclick="openGscModal()" class="btn-secondary text-xs">
+            <i data-lucide="trending-up" class="w-3.5 h-3.5 text-emerald-400"></i> GSC Guide
+          </button>
+          <button onclick="exportReportMarkdown()" class="btn-secondary text-xs">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Report (.md)
+          </button>
+          <button onclick="openPortableModal()" class="btn-secondary text-xs">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Portable &amp; GitHub
+          </button>
+          <button onclick="window.print()" class="btn-secondary text-xs">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print
+          </button>
+        </div>
+      </div>
+
+      <!-- 6-Step SEO & AI Dominance Workflow Progress Bar -->
+      <div class="glass-panel p-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-white flex items-center gap-1.5">
+            <i data-lucide="list-ordered" class="w-4 h-4 text-blue-400"></i> Step-by-Step Optimization Protocol
+          </span>
+          <span class="text-[11px] text-[#8b949e]">Click any step to jump directly to action</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+          <button onclick="scrollToInput()" class="p-2 rounded bg-[#0d1117] border border-[#30363d] hover:border-blue-400 text-left transition-all group">
+            <div class="text-[10px] text-blue-400 font-bold">STEP 1</div>
+            <div class="font-semibold text-white group-hover:text-blue-300 truncate">1. Audit Page</div>
+            <div class="text-[10px] text-[#8b949e] truncate">Live URL or HTML</div>
+          </button>
+          <button onclick="switchTab('target_keyword')" class="p-2 rounded bg-[#0d1117] border border-[#30363d] hover:border-blue-400 text-left transition-all group">
+            <div class="text-[10px] text-blue-400 font-bold">STEP 2</div>
+            <div class="font-semibold text-white group-hover:text-blue-300 truncate">2. Target Keyword</div>
+            <div class="text-[10px] text-[#8b949e] truncate">LSI &amp; Similar</div>
+          </button>
+          <button onclick="openCanvasFallbackModal()" class="p-2 rounded bg-[#0d1117] border border-[#30363d] hover:border-purple-400 text-left transition-all group">
+            <div class="text-[10px] text-purple-400 font-bold">STEP 3</div>
+            <div class="font-semibold text-white group-hover:text-purple-300 truncate">3. 3D &amp; Fallbacks</div>
+            <div class="text-[10px] text-[#8b949e] truncate">WebGL .sr-only</div>
+          </button>
+          <button onclick="openGscModal()" class="p-2 rounded bg-[#0d1117] border border-[#30363d] hover:border-emerald-400 text-left transition-all group">
+            <div class="text-[10px] text-emerald-400 font-bold">STEP 4</div>
+            <div class="font-semibold text-white group-hover:text-emerald-300 truncate">4. Google Console</div>
+            <div class="text-[10px] text-[#8b949e] truncate">Sitemap &amp; Indexing</div>
+          </button>
+          <button onclick="switchTab('syndication')" class="p-2 rounded bg-[#0d1117] border border-[#30363d] hover:border-amber-400 text-left transition-all group">
+            <div class="text-[10px] text-amber-400 font-bold">STEP 5</div>
+            <div class="font-semibold text-white group-hover:text-amber-300 truncate">5. Syndication</div>
+            <div class="text-[10px] text-[#8b949e] truncate">GitHub &amp; Citations</div>
+          </button>
+          <button onclick="openAiExportModal('claude')" class="p-2 rounded bg-[#0d1117] border border-[#30363d] hover:border-blue-400 text-left transition-all group">
+            <div class="text-[10px] text-indigo-400 font-bold">STEP 6</div>
+            <div class="font-semibold text-white group-hover:text-indigo-300 truncate">6. AI Refactor</div>
+            <div class="text-[10px] text-[#8b949e] truncate">Claude &amp; DeepSeek</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex overflow-x-auto pb-1 gap-1 border-b border-[#21262d] text-xs font-medium">
+        <button class="tab-btn active" onclick="switchTab('overview')">
+          <i data-lucide="layout" class="w-3.5 h-3.5"></i> Overview
+        </button>
+        <button class="tab-btn" onclick="switchTab('target_keyword')">
+          <i data-lucide="target" class="w-3.5 h-3.5 text-blue-400"></i> Target Keyword
+        </button>
+        <button class="tab-btn" onclick="switchTab('syndication')">
+          <i data-lucide="share-2" class="w-3.5 h-3.5 text-blue-400"></i> Directory Playbook
+        </button>
+        <button class="tab-btn" onclick="switchTab('crawler_matrix')">
+          <i data-lucide="network" class="w-3.5 h-3.5"></i> 14 Crawlers <span id="botMatrixCountBadge" class="ml-1 text-[10px] px-1.5 py-0.2 rounded bg-[#21262d] text-[#8b949e]">14</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('javascript_seo')">
+          <i data-lucide="code" class="w-3.5 h-3.5"></i> JS vs HTML
+        </button>
+        <button class="tab-btn" onclick="switchTab('geo_ai')">
+          <i data-lucide="cpu" class="w-3.5 h-3.5"></i> llms.txt
+        </button>
+        <button class="tab-btn" onclick="switchTab('technical_seo')">
+          <i data-lucide="shield" class="w-3.5 h-3.5"></i> Speed &amp; Security
+        </button>
+        <button class="tab-btn" onclick="switchTab('content_seo')">
+          <i data-lucide="type" class="w-3.5 h-3.5"></i> Content
+        </button>
+        <button class="tab-btn" onclick="switchTab('schema_studio')">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i> Schema
+        </button>
+        <button class="tab-btn" onclick="switchTab('previews')">
+          <i data-lucide="eye" class="w-3.5 h-3.5"></i> Previews
+        </button>
+        <button class="tab-btn" onclick="switchTab('generators')">
+          <i data-lucide="wrench" class="w-3.5 h-3.5"></i> Fixers
+        </button>
+      </div>
+
+      <!-- TAB 1: OVERVIEW -->
+      <section id="tab-overview" class="tab-content space-y-5">
+        <!-- 6 Score Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <!-- Overall -->
+          <div class="glass-panel p-3.5 flex flex-col items-center text-center">
+            <span class="text-xs text-[#8b949e] mb-1">Overall Health</span>
+            <div class="score-circle mb-1" id="dial-overall">
+              <span class="score-value" id="score-overall-val">85</span>
+            </div>
+            <span class="text-xs text-[#8b949e] font-medium truncate" id="grade-overall-text">Healthy</span>
+          </div>
+
+          <!-- JavaScript Static HTML Score -->
+          <div class="glass-panel p-3.5 flex flex-col items-center text-center">
+            <span class="text-xs text-[#8b949e] mb-1">JS / Static HTML</span>
+            <div class="score-circle mb-1" id="dial-js">
+              <span class="score-value" id="score-js-val">90</span>
+            </div>
+            <span class="text-xs text-[#8b949e]">Non-JS Access</span>
+          </div>
+
+          <!-- AI / GEO -->
+          <div class="glass-panel p-3.5 flex flex-col items-center text-center">
+            <span class="text-xs text-[#8b949e] mb-1">AI / GEO Score</span>
+            <div class="score-circle mb-1" id="dial-geo">
+              <span class="score-value" id="score-geo-val">70</span>
+            </div>
+            <span class="text-xs text-[#8b949e]">LLM Indexing</span>
+          </div>
+
+          <!-- Technical & Speed -->
+          <div class="glass-panel p-3.5 flex flex-col items-center text-center">
+            <span class="text-xs text-[#8b949e] mb-1">Speed &amp; Security</span>
+            <div class="score-circle mb-1" id="dial-tech">
+              <span class="score-value" id="score-tech-val">90</span>
+            </div>
+            <span class="text-xs text-[#8b949e]">TTFB &amp; TLS</span>
+          </div>
+
+          <!-- Content -->
+          <div class="glass-panel p-3.5 flex flex-col items-center text-center">
+            <span class="text-xs text-[#8b949e] mb-1">Content</span>
+            <div class="score-circle mb-1" id="dial-content">
+              <span class="score-value" id="score-content-val">75</span>
+            </div>
+            <span class="text-xs text-[#8b949e]">Headings &amp; Words</span>
+          </div>
+
+          <!-- Structured Data -->
+          <div class="glass-panel p-3.5 flex flex-col items-center text-center">
+            <span class="text-xs text-[#8b949e] mb-1">Structured Data</span>
+            <div class="score-circle mb-1" id="dial-schema">
+              <span class="score-value" id="score-schema-val">60</span>
+            </div>
+            <span class="text-xs text-[#8b949e]">JSON-LD</span>
+          </div>
+        </div>
+
+        <!-- Metric Badges Row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 text-xs">
+          <div class="glass-panel p-3">
+            <span class="text-[#8b949e] block text-xs">TTFB Latency</span>
+            <div class="text-base font-bold text-white mt-1" id="stat-ttfb">0 ms</div>
+            <span class="text-[11px] text-[#3fb950]" id="stat-ttfb-label">Optimal</span>
+          </div>
+          <div class="glass-panel p-3">
+            <span class="text-[#8b949e] block text-xs">HTTP Compression</span>
+            <div class="text-base font-bold text-white mt-1 uppercase font-mono" id="stat-compression">gzip</div>
+            <span class="text-[11px] text-[#8b949e]">Payload encoding</span>
+          </div>
+          <div class="glass-panel p-3">
+            <span class="text-[#8b949e] block text-xs">HTML Word Count</span>
+            <div class="text-base font-bold text-white mt-1" id="stat-words">0</div>
+            <span class="text-[11px] text-[#8b949e]" id="stat-reading-time">~0 min read</span>
+          </div>
+          <div class="glass-panel p-3">
+            <span class="text-[#8b949e] block text-xs">Flesch Reading Ease</span>
+            <div class="text-base font-bold text-white mt-1" id="stat-readability">0/100</div>
+            <span class="text-[11px] text-[#8b949e] truncate block" id="stat-readability-label">Standard</span>
+          </div>
+          <div class="glass-panel p-3">
+            <span class="text-[#8b949e] block text-xs">Images Audited</span>
+            <div class="text-base font-bold text-white mt-1" id="stat-images">0</div>
+            <span class="text-[11px] text-[#d29922]" id="stat-missing-alt">0 missing alt</span>
+          </div>
+          <div class="glass-panel p-3">
+            <span class="text-[#8b949e] block text-xs">/llms.txt File</span>
+            <div class="text-base font-bold text-white mt-1" id="stat-llms">Checking...</div>
+            <span class="text-[11px] text-[#8b949e]">RFC format</span>
+          </div>
+        </div>
+
+        <!-- Issues and Recommendations -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Critical Issues & Warnings -->
+          <div class="glass-panel p-4">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-[#21262d]">
+              <h3 class="font-semibold text-sm flex items-center gap-1.5 text-[#f85149]">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i> Issues &amp; Warnings (<span id="issuesCount">0</span>)
+              </h3>
+            </div>
+            <div id="issuesList" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Successful Passes -->
+          <div class="glass-panel p-4">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-[#21262d]">
+              <h3 class="font-semibold text-sm flex items-center gap-1.5 text-[#3fb950]">
+                <i data-lucide="check" class="w-4 h-4"></i> Passed Checks (<span id="passesCount">0</span>)
+              </h3>
+            </div>
+            <div id="passesList" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: TARGET KEYWORD -->
+      <section id="tab-target_keyword" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-[#21262d]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-[#21262d] text-white">Target Keyword</span>
+                <span class="text-xs text-[#8b949e]" id="kwIntentBadge">Search Intent: Commercial</span>
+              </div>
+              <h3 class="text-lg font-bold text-white mt-1.5 flex items-center gap-2">
+                Ranking Signals for: <span class="text-blue-400" id="kwTargetDisplay">"developer platform"</span>
+              </h3>
+              <p class="text-xs text-[#8b949e] mt-0.5">Audits keyword presence in title, headings, meta description, opening sentences, and density.</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="score-circle mb-1" id="dial-kw">
+                <span class="score-value" id="score-kw-val">75</span>
+              </div>
+              <span class="text-xs text-[#8b949e]">Keyword Score</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4" id="kwChecksContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- 7-Step Optimization Checklist for Ranking #1 -->
+        <div class="glass-panel p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-[#21262d]">
+            <div>
+              <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-blue-400"></i>
+                7-Step Blueprint to Rank #1 for This Keyword
+              </h4>
+              <p class="text-xs text-[#8b949e] mt-0.5">Exact ranking formula used by high-authority platforms to rank on Google Page 1 and get cited in ChatGPT/Perplexity.</p>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Core Strategy</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="kwOptimizationStepsContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Similar Searches & Questions (PAA) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Similar / Long-Tail Searches -->
+          <div class="glass-panel p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+                  <i data-lucide="search" class="w-4 h-4 text-emerald-400"></i>
+                  Similar &amp; Related Searches ("People Also Search For")
+                </h4>
+                <p class="text-xs text-[#8b949e] mt-0.5">Add these queries as &lt;h2&gt; subheadings to capture related long-tail traffic.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" id="kwSimilarSearchesContainer">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- People Also Ask -->
+          <div class="glass-panel p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+                  <i data-lucide="help-circle" class="w-4 h-4 text-purple-400"></i>
+                  Questions Users Ask ("People Also Ask")
+                </h4>
+                <p class="text-xs text-[#8b949e] mt-0.5">Answer these questions in your FAQ to get Google Accordion snippets &amp; AI answers.</p>
+              </div>
+            </div>
+            <div class="space-y-2 text-xs" id="kwPaaContainer">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Semantic LSI Terms -->
+        <div class="glass-panel p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-semibold text-white flex items-center gap-2">
+                <i data-lucide="tag" class="w-4 h-4 text-amber-400"></i>
+                Semantic LSI Entity Terms
+              </h4>
+              <p class="text-xs text-[#8b949e] mt-0.5">Google RankBrain and AI models (GPT-4, Claude) verify topical depth by looking for these co-occurring terms in your body text.</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 pt-1" id="kwLsiContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="glass-panel p-5 space-y-4">
+          <h4 class="text-sm font-semibold text-white">Suggested Code Snippets for this Keyword</h4>
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[#8b949e] font-medium">Optimized &lt;title&gt; (Front-loaded)</span>
+                <button onclick="copyToClipboard('kwGenTitle')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+              </div>
+              <pre class="code-box text-xs" id="kwGenTitle">&lt;title&gt;Developer Platform — Complete Guide&lt;/title&gt;</pre>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[#8b949e] font-medium">Meta Description</span>
+                <button onclick="copyToClipboard('kwGenDesc')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+              </div>
+              <pre class="code-box text-xs" id="kwGenDesc">&lt;meta name="description" content="..."&gt;</pre>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[#8b949e] font-medium">Lead &lt;h1&gt; and First 100 Words Definition</span>
+                <button onclick="copyToClipboard('kwGenH1')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+              </div>
+              <pre class="code-box text-xs" id="kwGenH1">&lt;h1&gt;The Solution for Developer Platform&lt;/h1&gt;</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: DIRECTORY PLAYBOOK -->
+      <section id="tab-syndication" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <h3 class="text-base font-bold text-white mb-1">Get Your Site Listed &amp; Recommended</h3>
+          <p class="text-xs text-[#8b949e] max-w-3xl">Search engines and AI bots (ChatGPT Search, Perplexity, Claude, Gemini) recommend websites that are cited across high-authority directories, GitHub repositories, and community discussions.</p>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-sm font-semibold text-white">High-Authority Directory Submission Targets</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="directoryCardsContainer">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="glass-panel p-5">
+            <h4 class="text-sm font-semibold text-white mb-1">Community Discussion Citation Template</h4>
+            <p class="text-xs text-[#8b949e] mb-3">Google AI Overviews and Perplexity frequently cite Reddit and developer forum threads for recommendations on <span class="text-blue-400" id="syndicateKwDisplay">this topic</span>.</p>
+            <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] text-xs">
+              <p class="font-mono text-[#c9d1d9]" id="redditTemplateText">"If you're dealing with developer platform requirements..."</p>
+              <button onclick="copyToClipboard('redditTemplateText')" class="btn-secondary text-xs mt-2.5">Copy Template</button>
+            </div>
+          </div>
+
+          <div class="glass-panel p-5">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-semibold text-white">Organization sameAs Schema</h4>
+              <button onclick="copyToClipboard('schemaSameAsCode')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+            </div>
+            <p class="text-xs text-[#8b949e] mb-3">Links your brand to GitHub, X, LinkedIn, and Crunchbase so Google connects them into a verified Knowledge Graph entity.</p>
+            <pre class="code-box text-xs max-h-40 overflow-y-auto" id="schemaSameAsCode">// Schema</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: 14-BOT MATRIX -->
+      <section id="tab-crawler_matrix" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <div class="mb-4">
+            <h3 class="text-base font-bold text-white">14-Bot Comparative Crawler Matrix</h3>
+            <p class="text-xs text-[#8b949e] mt-0.5">Live probe across Search Engine Crawlers, AI Training Bots, Live AI Search Bots, and Desktop Browsers.</p>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bot Agent</th>
+                  <th>Vendor</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Latency</th>
+                  <th>Payload</th>
+                  <th>WAF Block</th>
+                  <th>X-Robots-Tag</th>
+                </tr>
+              </thead>
+              <tbody id="crawlerMatrixBody" class="font-mono text-xs">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: JS VS STATIC HTML -->
+      <section id="tab-javascript_seo" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#21262d]">
+            <div>
+              <h3 class="text-base font-bold text-white">JavaScript vs Static HTML Fallback</h3>
+              <p class="text-xs text-[#8b949e] mt-0.5">AI bots (GPTBot, ClaudeBot, PerplexityBot) do not execute JavaScript. If content is rendered via client-side React/Vue without SSR or &lt;noscript&gt;, AI crawlers see an empty page.</p>
+            </div>
+            <div id="jsAiStatusBadge">
+              <!-- Dynamic -->
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 text-xs">
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">SPA / CSR Dependency</span>
+              <div class="text-sm font-semibold mt-0.5" id="jsSpaStatus">-</div>
+              <span class="text-[11px] text-[#6e7681] block mt-0.5" id="jsSpaDetail">Checking container</span>
+            </div>
+
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Render-Blocking Scripts in &lt;head&gt;</span>
+              <div class="text-sm font-semibold mt-0.5" id="jsBlockingCount">-</div>
+              <span class="text-[11px] text-[#6e7681] block mt-0.5">Missing defer/async</span>
+            </div>
+
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">&lt;noscript&gt; Static Fallback</span>
+              <div class="text-sm font-semibold mt-0.5" id="jsNoscriptStatus">-</div>
+              <span class="text-[11px] text-[#6e7681] block mt-0.5" id="jsNoscriptDetail">Fallback content</span>
+            </div>
+
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Raw HTML Words</span>
+              <div class="text-sm font-semibold text-[#3fb950] mt-0.5" id="jsRawWords">-</div>
+              <span class="text-[11px] text-[#6e7681] block mt-0.5">Visible without JS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-white">Render-Blocking Scripts in &lt;head&gt;</h3>
+            <button onclick="switchTab('generators')" class="text-xs text-blue-400 hover:underline">Generate Defer Code</button>
+          </div>
+          <div id="renderBlockingList" class="space-y-2">
+            <!-- Dynamic -->
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <h3 class="text-sm font-semibold text-white mb-1">Browser (With JS) vs AI Crawler (Raw Static HTML)</h3>
+          <p class="text-xs text-[#8b949e] mb-3">Comparison between what a desktop browser renders versus what non-JS AI scrapers extract from the initial HTML payload.</p>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs font-mono">
+            <div class="p-3 rounded bg-[#0d1117] border border-[#30363d]">
+              <div class="font-sans font-semibold text-white pb-1.5 mb-2 border-b border-[#21262d]">Browser (Full JavaScript)</div>
+              <div class="text-xs text-[#8b949e] space-y-1 font-sans">
+                <div>Scripts Loaded: <strong class="text-white" id="simTotalScripts">0</strong></div>
+                <div>DOM Elements: <strong class="text-white" id="simTotalDom">0</strong></div>
+                <div>Title Tag: <strong class="text-white" id="simTitle">-</strong></div>
+              </div>
+            </div>
+
+            <div class="p-3 rounded bg-[#0d1117] border border-[#30363d]">
+              <div class="font-sans font-semibold text-white pb-1.5 mb-2 border-b border-[#21262d]">AI Crawler View (Zero JavaScript)</div>
+              <div class="p-2 rounded bg-[#161b22] border border-[#21262d] max-h-36 overflow-y-auto text-[#c9d1d9] text-xs font-sans leading-relaxed" id="simRawTextPreview">
+                <!-- Dynamic snippet -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: LLMS.TXT -->
+      <section id="tab-geo_ai" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#21262d]">
+            <div>
+              <h3 class="text-base font-bold text-white">/llms.txt Inspection</h3>
+              <p class="text-xs text-[#8b949e] mt-0.5">RFC standard for AI assistants (ChatGPT, Claude, Perplexity) to digest clean markdown summaries without parsing HTML.</p>
+            </div>
+            <div id="llmsStatusBadge">
+              <!-- Dynamic -->
+            </div>
+          </div>
+
+          <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Standard H1 Heading</span>
+              <span id="llms-check-h1" class="font-semibold text-white">-</span>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Summary Blockquote</span>
+              <span id="llms-check-bq" class="font-semibold text-white">-</span>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Markdown Section Links</span>
+              <span id="llms-check-sec" class="font-semibold text-white">-</span>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs text-[#8b949e]">Content of /llms.txt:</span>
+              <button onclick="switchTab('generators')" class="text-xs text-blue-400 hover:underline">Open llms.txt Generator</button>
+            </div>
+            <pre class="code-box text-xs max-h-40 overflow-y-auto" id="llmsRawContent">No /llms.txt found.</pre>
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <h3 class="text-sm font-semibold text-white mb-1">AI Bot Permissions in robots.txt</h3>
+          <p class="text-xs text-[#8b949e] mb-3">Checks permissions for OpenAI, Anthropic, Google, and Perplexity crawlers.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="aiBotDirectivesGrid">
+            <!-- Dynamic -->
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <h3 class="text-sm font-semibold text-white mb-2">Content Structure &amp; Facts</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Direct Answer in Lead 200 Words</span>
+              <div class="text-sm font-semibold mt-0.5" id="geoLeadDef">-</div>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Chunkability Score</span>
+              <div class="text-sm font-semibold mt-0.5" id="geoChunkScore">-</div>
+              <span class="text-[11px] text-[#6e7681] block mt-0.5" id="geoChunkDetail">Words per section</span>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Named Facts &amp; Numbers</span>
+              <div class="text-sm font-semibold text-white mt-0.5" id="geoFactCount">0 facts</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: SPEED & SECURITY -->
+      <section id="tab-technical_seo" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <h3 class="text-base font-bold text-white mb-3">Security Headers &amp; Server Infrastructure</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">HTTPS Encryption</span>
+              <p class="font-semibold text-sm" id="techHttps">-</p>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">HSTS Header</span>
+              <p class="font-semibold text-sm" id="techHsts">-</p>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">X-Content-Type-Options</span>
+              <p class="font-semibold text-sm" id="techNosniff">-</p>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Content-Security-Policy</span>
+              <p class="font-semibold text-sm" id="techCsp">-</p>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Payload Compression</span>
+              <p class="font-semibold text-sm" id="techCompression">-</p>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Server TTFB Latency</span>
+              <p class="font-semibold text-sm" id="techLatency">-</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <h3 class="text-sm font-semibold text-white mb-3">Image Layout &amp; Formats</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Images Missing Dimensions (CLS Risk)</span>
+              <p class="font-semibold text-sm" id="techClsImages">0</p>
+            </div>
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <span class="text-[#8b949e] block mb-1">Modern Image Formats (AVIF/WebP)</span>
+              <p class="font-semibold text-sm" id="techModernImages">0</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 8: CONTENT -->
+      <section id="tab-content_seo" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <h3 class="text-base font-bold text-white mb-3">Title &amp; Meta Description</h3>
+          <div class="space-y-3 text-xs">
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[#8b949e]">Title Tag &bull; <span id="titlePixelDisplay" class="font-mono text-white">~0px</span></span>
+                <span class="font-mono text-[#8b949e]" id="titleCharCount">0 chars</span>
+              </div>
+              <p class="text-sm font-medium text-white" id="metaTitleDisplay">-</p>
+              <div class="mt-2 w-full bg-[#21262d] h-1.5 rounded overflow-hidden">
+                <div id="titleLengthBar" class="h-full bg-[#3fb950]" style="width: 50%;"></div>
+              </div>
+            </div>
+
+            <div class="p-3 rounded bg-[#0d1117] border border-[#21262d]">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[#8b949e]">Meta Description &bull; <span id="descCtaBadge" class="text-white">CTA Detected</span></span>
+                <span class="font-mono text-[#8b949e]" id="descCharCount">0 chars</span>
+              </div>
+              <p class="text-xs text-[#c9d1d9]" id="metaDescDisplay">-</p>
+              <div class="mt-2 w-full bg-[#21262d] h-1.5 rounded overflow-hidden">
+                <div id="descLengthBar" class="h-full bg-[#3fb950]" style="width: 50%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-bold text-white">Headings Hierarchy (H1 - H6)</h3>
+            <div class="flex items-center gap-1.5 text-xs font-mono">
+              <span class="px-2 py-0.5 rounded bg-[#21262d] text-white" id="countH1">0 H1</span>
+              <span class="px-2 py-0.5 rounded bg-[#21262d] text-[#8b949e]" id="countH2">0 H2</span>
+              <span class="px-2 py-0.5 rounded bg-[#21262d] text-[#8b949e]" id="countH3">0 H3</span>
+            </div>
+          </div>
+          <div id="headingsTree" class="space-y-1.5 max-h-72 overflow-y-auto text-xs">
+            <!-- Dynamic -->
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <h3 class="text-sm font-semibold text-white mb-1">Keyword Stuffing &amp; Repetition Check</h3>
+          <p class="text-xs text-[#8b949e] mb-3">Identifies phrases exceeding 3.5% density that could trigger search engine spam filters.</p>
+          <div id="overOptContent">
+            <!-- Dynamic -->
+          </div>
+        </div>
+
+        <div class="glass-panel p-5">
+          <h3 class="text-sm font-semibold text-white mb-2">Link Architecture</h3>
+          <div id="linksContent" class="space-y-2">
+            <!-- Dynamic -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 9: SCHEMA -->
+      <section id="tab-schema_studio" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#21262d]">
+            <div>
+              <h3 class="text-base font-bold text-white">Structured Data &amp; Schema.org Validator</h3>
+              <p class="text-xs text-[#8b949e] mt-0.5">Google rich snippets (FAQ drop-downs, star ratings) and Knowledge Graph entities rely on JSON-LD structured data.</p>
+            </div>
+            <button onclick="switchTab('generators')" class="btn-secondary text-xs">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Schema Snippet
+            </button>
+          </div>
+
+          <div class="mt-4" id="detectedSchemasContainer">
+            <!-- Dynamic Schemas List -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 10: PREVIEWS -->
+      <section id="tab-previews" class="tab-content hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Google SERP Snippet Preview -->
+          <div class="glass-panel p-5">
+            <h3 class="text-sm font-semibold text-white mb-3">Google Desktop SERP Simulator</h3>
+            <div class="p-4 rounded bg-white text-slate-900 border border-slate-300">
+              <div class="flex items-center gap-2 text-xs text-slate-600 mb-1">
+                <span class="w-3.5 h-3.5 rounded-full bg-slate-200 flex items-center justify-center font-bold text-[9px]">🌐</span>
+                <span class="truncate font-sans" id="previewSerpBreadcrumb">https://example.com</span>
+              </div>
+              <h4 class="text-blue-700 hover:underline text-base font-medium leading-snug cursor-pointer line-clamp-2" id="previewSerpTitle">
+                Page Title Appears Here
+              </h4>
+              <p class="text-xs text-slate-700 mt-1 line-clamp-2" id="previewSerpDesc">
+                Meta description preview will be displayed here as it appears in search results.
+              </p>
+            </div>
+          </div>
+
+          <!-- Twitter / X Card Preview -->
+          <div class="glass-panel p-5">
+            <h3 class="text-sm font-semibold text-white mb-3">X / Twitter Card Preview</h3>
+            <div class="rounded border border-[#30363d] bg-[#0d1117] overflow-hidden max-w-sm mx-auto">
+              <div class="w-full h-40 bg-[#161b22] flex items-center justify-center text-[#8b949e] overflow-hidden relative" id="previewTwitterImageContainer">
+                <img id="previewTwitterImg" src="" alt="Card preview" class="w-full h-full object-cover hidden">
+                <span id="previewTwitterImgPlaceholder" class="text-xs flex items-center gap-1.5">
+                  <i data-lucide="image" class="w-4 h-4"></i> No image provided
+                </span>
+              </div>
+              <div class="p-3">
+                <span class="text-[11px] text-[#8b949e] font-mono uppercase" id="previewTwitterDomain">example.com</span>
+                <h4 class="text-sm font-semibold text-white leading-tight mt-0.5 line-clamp-1" id="previewTwitterTitle">
+                  Twitter Card Title
+                </h4>
+                <p class="text-xs text-[#8b949e] mt-1 line-clamp-2" id="previewTwitterDesc">
+                  Twitter description text preview...
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 11: 1-CLICK FIXERS -->
+      <section id="tab-generators" class="tab-content hidden space-y-5">
+        <div class="glass-panel p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-bold text-white">Auto-Optimized HTML File</h3>
+            <p class="text-xs text-[#8b949e] mt-0.5 max-w-2xl">Repairs detected defects: adds missing meta tags, canonical URL, OpenGraph, script defer attributes, image alt tags, static &lt;noscript&gt; fallback, and Schema JSON-LD.</p>
+          </div>
+          <button onclick="downloadAutoFixedHtml()" class="btn-primary text-xs">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download HTML
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Generator: noscript -->
+          <div class="glass-panel p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-white">&lt;noscript&gt; Semantic Fallback</h3>
+              <button onclick="copyToClipboard('genNoscriptResult')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+            </div>
+            <p class="text-xs text-[#8b949e] mb-3">Clean static HTML fallback for client-side JavaScript sites so non-JS AI bots index your content.</p>
+            <button onclick="triggerGenerateNoscript()" class="btn-secondary text-xs w-full mb-3">Generate &lt;noscript&gt; Block</button>
+            <pre class="code-box text-xs max-h-40 overflow-y-auto" id="genNoscriptResult"><!-- Noscript snippet --></pre>
+          </div>
+
+          <!-- Generator: defer -->
+          <div class="glass-panel p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-white">Script Deferral Fix</h3>
+              <button onclick="copyToClipboard('genDeferResult')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+            </div>
+            <p class="text-xs text-[#8b949e] mb-3">Converts render-blocking scripts in &lt;head&gt; into deferred tags to unblock HTML parsing.</p>
+            <pre class="code-box text-xs max-h-40 overflow-y-auto" id="genDeferResult"><!-- Defer fixes --></pre>
+          </div>
+
+          <!-- Generator: llms.txt -->
+          <div class="glass-panel p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-white">/llms.txt Generator</h3>
+              <button onclick="copyToClipboard('genLlmsResult')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+            </div>
+            <div class="space-y-2.5 text-xs mb-3">
+              <div>
+                <label class="block text-[#8b949e] mb-1">Site Title</label>
+                <input type="text" id="genLlmsTitle" class="w-full px-2.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-white" placeholder="Product Title">
+              </div>
+              <div>
+                <label class="block text-[#8b949e] mb-1">Core Summary</label>
+                <textarea id="genLlmsSummary" rows="2" class="w-full px-2.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-white" placeholder="Summary for AI bots..."></textarea>
+              </div>
+              <button onclick="triggerGenerateLlms()" class="btn-secondary text-xs w-full">Generate llms.txt</button>
+            </div>
+            <pre class="code-box text-xs max-h-36 overflow-y-auto" id="genLlmsResult"># Result</pre>
+          </div>
+
+          <!-- Generator: robots.txt -->
+          <div class="glass-panel p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-white">robots.txt Generator</h3>
+              <button onclick="copyToClipboard('genRobotsResult')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+            </div>
+            <div class="space-y-2.5 text-xs mb-3">
+              <div>
+                <label class="block text-[#8b949e] mb-1">Strategy</label>
+                <select id="genRobotsPreset" class="w-full px-2.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-white">
+                  <option value="ai_search_friendly">Hybrid (Allow Search &amp; Citations, Restrict Training Scrapers)</option>
+                  <option value="open_all">Open Access (Allow All Crawlers)</option>
+                  <option value="block_all_ai">Strict Privacy (Block All AI Bots)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[#8b949e] mb-1">Sitemap URL</label>
+                <input type="text" id="genRobotsSitemap" class="w-full px-2.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-white" placeholder="https://example.com/sitemap.xml">
+              </div>
+              <button onclick="triggerGenerateRobots()" class="btn-secondary text-xs w-full">Generate robots.txt</button>
+            </div>
+            <pre class="code-box text-xs max-h-36 overflow-y-auto" id="genRobotsResult"># Result</pre>
+          </div>
+
+          <!-- Generator: Schema -->
+          <div class="glass-panel p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-white">Schema.org JSON-LD Generator</h3>
+              <button onclick="copyToClipboard('genSchemaResult')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+            </div>
+            <div class="space-y-2.5 text-xs mb-3">
+              <div>
+                <label class="block text-[#8b949e] mb-1">Schema Type</label>
+                <select id="genSchemaType" class="w-full px-2.5 py-1.5 rounded bg-[#0d1117] border border-[#30363d] text-white">
+                  <option value="Organization">Organization</option>
+                  <option value="FAQPage">FAQPage</option>
+                  <option value="Article">Article</option>
+                  <option value="WebSite">WebSite</option>
+                </select>
+              </div>
+              <button onclick="triggerGenerateSchema()" class="btn-secondary text-xs w-full">Generate JSON-LD</button>
+            </div>
+            <pre class="code-box text-xs max-h-36 overflow-y-auto" id="genSchemaResult"><!-- Result --></pre>
+          </div>
+
+          <!-- Generator: Meta -->
+          <div class="glass-panel p-5">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-white">&lt;head&gt; Meta Tag Snippet</h3>
+              <button onclick="copyToClipboard('genMetaResult')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+            </div>
+            <p class="text-xs text-[#8b949e] mb-3">Assembled meta tags with title, description, viewport, OpenGraph, and Twitter tags.</p>
+            <pre class="code-box text-xs max-h-36 overflow-y-auto" id="genMetaResult"><!-- Meta snippet --></pre>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-[#30363d] py-5 mt-10 bg-[#161b22] text-xs text-[#8b949e]">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <span>OmniSEO &bull; Search Engine &amp; Web Crawler Audit Tool</span>
+      <div class="flex items-center gap-3 text-[#6e7681]">
+        <span>Standard SEO</span>
+        <span>&bull;</span>
+        <span>JS vs Static HTML</span>
+        <span>&bull;</span>
+        <span>llms.txt</span>
+        <span>&bull;</span>
+        <span>Schema.org</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Portable & GitHub Modal -->
+  <div id="portableModal" class="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 max-w-2xl w-full space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#30363d]">
+        <div class="flex items-center gap-2">
+          <i data-lucide="share-2" class="w-5 h-5 text-blue-400"></i>
+          <h3 class="text-base font-bold text-white">Portable Package &amp; GitHub Setup</h3>
+        </div>
+        <button onclick="closePortableModal()" class="text-[#8b949e] hover:text-white p-1">✕</button>
+      </div>
+
+      <p class="text-xs text-[#8b949e]">OmniSEO Studio is completely portable. You can zip this folder to send to friends or publish it as your own GitHub repository.</p>
+
+      <div class="space-y-3 text-xs">
+        <!-- 1-Click Windows -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">1. Windows 1-Click Launcher (No setup needed)</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">start.bat</span>
+          </div>
+          <p class="text-[#8b949e]">Your friends just double-click <code class="text-blue-400">start.bat</code>. It verifies Python, installs dependencies, launches the server, and auto-opens their browser.</p>
+        </div>
+
+        <!-- 1-Click Mac/Linux -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">2. Mac / Linux Launcher</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 font-mono">./start.sh</span>
+          </div>
+          <p class="text-[#8b949e]">Run <code class="text-blue-400">chmod +x start.sh && ./start.sh</code> in terminal.</p>
+        </div>
+
+        <!-- CLI Mode -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">3. Standalone CLI Terminal Tool</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono">cli.py</span>
+          </div>
+          <p class="text-[#8b949e]">Run direct audits from terminal without the web browser:</p>
+          <pre class="code-box text-[11px]">python cli.py https://github.com --keyword "developer platform" --export report.md</pre>
+        </div>
+
+        <!-- GitHub Publish -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">4. Publish to GitHub in 3 Commands</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-mono">git push</span>
+          </div>
+          <p class="text-[#8b949e]">This folder is already a Git repository. To push to your GitHub account:</p>
+          <pre class="code-box text-[11px]">git remote add origin https://github.com/&lt;your-username&gt;/omni-seo-studio.git
+git branch -M main
+git push -u origin main</pre>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closePortableModal()" class="btn-secondary text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Export Modal (Claude & DeepSeek) -->
+  <div id="aiExportModal" class="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 max-w-3xl w-full space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#30363d]">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-5 h-5 text-blue-400"></i>
+          <h3 class="text-base font-bold text-white" id="aiModalTitle">AI Model Optimization Prompt</h3>
+        </div>
+        <button onclick="closeAiExportModal()" class="text-[#8b949e] hover:text-white p-1">✕</button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btnAiTabClaude" onclick="switchAiPromptTab('claude')" class="btn-secondary text-xs active">
+          <i data-lucide="bot" class="w-3.5 h-3.5 text-blue-400"></i> Claude (Anthropic XML)
+        </button>
+        <button id="btnAiTabDeepSeek" onclick="switchAiPromptTab('deepseek')" class="btn-secondary text-xs">
+          <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-400"></i> DeepSeek R1 (Chain-of-Thought)
+        </button>
+      </div>
+
+      <p class="text-xs text-[#8b949e]" id="aiModalDesc">Copy this prompt and paste it directly into Claude 3.5/3.7 or DeepSeek R1. The model will analyze all audit diagnostics and return a complete, refactored, 100/100 production codebase.</p>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs text-[#8b949e] font-mono" id="aiPromptTypeLabel">Claude 3.5/3.7 XML Architecture</span>
+          <button onclick="copyToClipboard('aiPromptContentBox')" class="btn-primary text-xs py-1 px-3">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Prompt
+          </button>
+        </div>
+        <pre class="code-box text-xs max-h-96 overflow-y-auto font-mono whitespace-pre-wrap select-all" id="aiPromptContentBox">Generating prompt from latest audit...</pre>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeAiExportModal()" class="btn-secondary text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D Canvas & WebGL Fallback Modal -->
+  <div id="canvasFallbackModal" class="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 max-w-3xl w-full space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#30363d]">
+        <div class="flex items-center gap-2">
+          <i data-lucide="box" class="w-5 h-5 text-purple-400"></i>
+          <h3 class="text-base font-bold text-white">3D Animated &amp; Canvas WebGL SEO Fallback</h3>
+        </div>
+        <button onclick="closeCanvasFallbackModal()" class="text-[#8b949e] hover:text-white p-1">✕</button>
+      </div>
+
+      <div class="p-3 bg-purple-500/10 border border-purple-500/20 rounded text-xs text-[#c9d1d9] space-y-1">
+        <div class="font-semibold text-purple-300">Why do 3D Canvas Sites Struggle to Rank?</div>
+        <p class="text-[#8b949e]">Googlebot, Bingbot, and AI search engines (ChatGPT, Perplexity) cannot read text inside WebGL canvases or 3D animations (Three.js, Spline). To rank #1, you must inject a WCAG 2.1 AA compliant semantic fallback layer and JSON-LD schema.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div>
+          <label class="block text-[#8b949e] mb-1">Project / Site Title</label>
+          <input type="text" id="canvasSiteTitle" placeholder="My 3D Portfolio / Studio" class="w-full px-3 py-1.5 bg-[#0d1117] border border-[#30363d] rounded text-white text-xs">
+        </div>
+        <div>
+          <label class="block text-[#8b949e] mb-1">Target Keyword</label>
+          <input type="text" id="canvasTargetKw" placeholder="interactive 3d web experience" class="w-full px-3 py-1.5 bg-[#0d1117] border border-[#30363d] rounded text-white text-xs">
+        </div>
+      </div>
+
+      <button onclick="triggerGenerate3dCanvasSnippet()" class="btn-primary text-xs w-full">
+        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Generate 3D SEO Fallback Snippet
+      </button>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs text-[#8b949e] font-mono">Semantic &lt;canvas&gt; + .sr-only Fallback Snippet</span>
+          <button onclick="copyToClipboard('canvasSnippetBox')" class="btn-secondary text-xs py-0.5 px-2">Copy</button>
+        </div>
+        <pre class="code-box text-xs max-h-72 overflow-y-auto font-mono whitespace-pre-wrap" id="canvasSnippetBox"><!-- Generated snippet --></pre>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeCanvasFallbackModal()" class="btn-secondary text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Search Console (GSC) Blueprint Modal -->
+  <div id="gscModal" class="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 hidden">
+    <div class="glass-panel p-6 max-w-3xl w-full space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-[#30363d]">
+        <div class="flex items-center gap-2">
+          <i data-lucide="trending-up" class="w-5 h-5 text-emerald-400"></i>
+          <h3 class="text-base font-bold text-white">Google Search Console (GSC) Ranking Blueprint</h3>
+        </div>
+        <button onclick="closeGscModal()" class="text-[#8b949e] hover:text-white p-1">✕</button>
+      </div>
+
+      <p class="text-xs text-[#8b949e]">Follow these 5 steps in Google Search Console to index your pages in under 24 hours and optimize click-through rates (CTR):</p>
+
+      <div class="space-y-3 text-xs">
+        <!-- Step 1 -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">Step 1: Add Property &amp; Verify Ownership</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">Domain Property</span>
+          </div>
+          <p class="text-[#8b949e]">In GSC, choose <strong>Domain Property</strong> (covers https://, http://, and all subdomains). Add the TXT verification record to your DNS provider (Cloudflare, Namecheap, GoDaddy).</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">Step 2: Submit Sitemap XML</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Instant Crawl</span>
+          </div>
+          <p class="text-[#8b949e]">Go to <strong>Sitemaps</strong> in the left sidebar. Enter <code class="text-blue-400">sitemap.xml</code> and click Submit. This signals Googlebot all URL endpoints immediately.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">Step 3: URL Inspection &amp; "Request Indexing"</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400">&lt; 24h Indexing</span>
+          </div>
+          <p class="text-[#8b949e]">Paste your page URL into the top search bar in GSC. Click <strong>"Test Live URL"</strong> to verify rendered HTML. Then click <strong>"Request Indexing"</strong> to force priority Googlebot crawling.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">Step 4: Performance Query Mining (CTR Boost)</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">Rank #1 Growth</span>
+          </div>
+          <p class="text-[#8b949e]">Check the <strong>Performance &gt; Search Results</strong> tab. Look for queries with <strong>high impressions but low CTR (&lt; 3%)</strong>. Add those exact query phrases into your &lt;h2&gt; subheadings and meta description!</p>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="p-3 bg-[#0d1117] rounded border border-[#30363d] space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-white">Step 5: Rich Results &amp; Schema Validation</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400">SERP Snippets</span>
+          </div>
+          <p class="text-[#8b949e]">Run your URL through <a href="https://search.google.com/test/rich-results" target="_blank" class="text-blue-400 underline">Google Rich Results Test</a>. Ensure your Organization, WebSite, and FAQPage schemas pass with green checkmarks.</p>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeGscModal()" class="btn-secondary text-xs">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Script -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
