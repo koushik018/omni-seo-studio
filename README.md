@@ -2,6 +2,10 @@
 
 > The Ultimate Enterprise Search Engine & Generative Engine Optimization (GEO) Audit Platform. Diagnoses every conceivable crawlability, indexing, semantic, performance, security, and AI scraping challenge across 14 search engines and AI models.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/koushik018/omni-seo-studio)
+
+🌐 **Live Landing Page**: [https://koushik018.github.io/omni-seo-studio/](https://koushik018.github.io/omni-seo-studio/)
+
 ---
 
 ## 🌟 Enterprise Feature Matrix
