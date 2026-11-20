@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniSEO Studio — Multi-Crawler & AI Search Engine Audit Suite</title>
+  <meta name="description" content="Audit web crawlers, generative AI indexing (GEO), JavaScript rendering, 3D WebGL canvases, and schemas. Self-contained and portable.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%232563eb'/><path d='M50 20 L80 80 L60 80 L50 55 L40 80 L20 80 Z' fill='%23ffffff'/></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0d1117; color: #f0f6fc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .card { background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; }
+    .code-box { background-color: #010409; border: 1px solid #30363d; border-radius: 6px; font-family: monospace; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="border-b border-[#30363d] bg-[#161b22]/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-sm">OS</div>
+        <span class="font-bold text-base text-white">OmniSEO Studio</span>
+        <span class="text-xs px-2 py-0.5 rounded bg-[#21262d] text-[#8b949e] border border-[#30363d]">Portable Edition</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/koushik018/omni-seo-studio" target="_blank" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#21262d] text-white hover:bg-[#30363d] border border-[#30363d] flex items-center gap-2">
+          <span>GitHub Repo</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-5xl mx-auto px-4 py-12 space-y-12">
+    <div class="text-center space-y-4 max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-medium text-blue-400">
+        <span>✨ 14-Bot Crawler • Generative AI (GEO) • 3D Canvas SEO • Claude & DeepSeek Ready</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+        The Autonomous Search Crawler &amp; AI Engine Optimization Suite
+      </h1>
+      <p class="text-sm sm:text-base text-[#8b949e] leading-relaxed">
+        Audit any website against Googlebot, Bingbot, GPTBot, ClaudeBot, and PerplexityBot. Analyze keyword dominance, generate 100/100 code, and fix 3D WebGL canvases with zero visible text.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-3">
+        <a href="https://github.com/koushik018/omni-seo-studio/archive/refs/heads/main.zip" class="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow flex items-center gap-2">
+          ⬇️ Download Portable Package (.zip)
+        </a>
+        <a href="https://render.com/deploy?repo=https://github.com/koushik018/omni-seo-studio" target="_blank" class="px-5 py-2.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-white border border-[#30363d] font-semibold text-sm flex items-center gap-2">
+          🚀 Deploy Free 24/7 on Render
+        </a>
+        <a href="https://github.com/koushik018/omni-seo-studio" target="_blank" class="px-4 py-2.5 rounded-lg text-[#8b949e] hover:text-white text-sm">
+          View Source Code &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- 1-Click Launch Guide -->
+    <div class="card p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          ⚡ Run on Any Computer in 1 Click (Windows / Mac / Linux)
+        </h2>
+        <span class="text-xs text-[#8b949e]">Zero Setup Required</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="p-4 bg-[#0d1117] rounded border border-[#30363d] space-y-2">
+          <div class="font-bold text-white text-sm flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px]">1</span>
+            Windows 1-Click
+          </div>
+          <p class="text-[#8b949e]">Extract zip anywhere (C: or D: drive). Double-click <code class="text-blue-400">start.bat</code>.</p>
+          <p class="text-[#6e7681]">Automatically installs dependencies and launches browser at localhost:8000.</p>
+        </div>
+
+        <div class="p-4 bg-[#0d1117] rounded border border-[#30363d] space-y-2">
+          <div class="font-bold text-white text-sm flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-purple-500/20 text-purple-400 flex items-center justify-center text-[10px]">2</span>
+            Mac &amp; Linux
+          </div>
+          <p class="text-[#8b949e]">Open terminal inside the folder and run:</p>
+          <pre class="code-box p-2 text-[11px] text-[#c9d1d9]">chmod +x start.sh && ./start.sh</pre>
+        </div>
+
+        <div class="p-4 bg-[#0d1117] rounded border border-[#30363d] space-y-2">
+          <div class="font-bold text-white text-sm flex items-center gap-2">
+            <span class="w-5 h-5 rounded bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px]">3</span>
+            Terminal CLI Tool
+          </div>
+          <p class="text-[#8b949e]">Run audits directly without a browser:</p>
+          <pre class="code-box p-2 text-[11px] text-[#c9d1d9]">python cli.py https://github.com -k "developer platform"</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core Capabilities Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+      <div class="card p-5 space-y-2">
+        <h3 class="text-sm font-semibold text-white">🎯 Target Keyword &amp; Semantic LSI Analyzer</h3>
+        <p class="text-[#8b949e] leading-relaxed">
+          Analyzes exact keyword placement in &lt;title&gt;, &lt;h1&gt;, meta, and first 100 words. Generates 8+ Similar Searches ("People Also Search For"), PAA question snippets, and co-occurring entity terms.
+        </p>
+      </div>
+
+      <div class="card p-5 space-y-2">
+        <h3 class="text-sm font-semibold text-white">🎨 3D Animated &amp; WebGL Canvas SEO</h3>
+        <p class="text-[#8b949e] leading-relaxed">
+          Search crawlers cannot read WebGL canvases. OmniSEO Studio generates the complete 4-tier semantic fallback DOM (.sr-only container + WebApplication schema) so 3D sites rank #1.
+        </p>
+      </div>
+
+      <div class="card p-5 space-y-2">
+        <h3 class="text-sm font-semibold text-white">🤖 Claude &amp; DeepSeek Prompt Exporter</h3>
+        <p class="text-[#8b949e] leading-relaxed">
+          One-click prompt generation for Claude 3.5/3.7 (Anthropic XML format) and DeepSeek R1 (&lt;think&gt; chain-of-thought protocol) to refactor any codebase to 100/100.
+        </p>
+      </div>
+
+      <div class="card p-5 space-y-2">
+        <h3 class="text-sm font-semibold text-white">📈 Google Search Console (GSC) Blueprint</h3>
+        <p class="text-[#8b949e] leading-relaxed">
+          Step-by-step guidance on domain verification, submitting sitemap.xml, requesting priority indexing in &lt; 24h, and mining high-impression low-CTR queries for top rankings.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-[#30363d] py-6 bg-[#161b22] text-xs text-[#8b949e] mt-12">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span>OmniSEO Studio • Created by <a href="https://github.com/koushik018" class="text-blue-400 hover:underline">@koushik018</a></span>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/koushik018/omni-seo-studio" class="hover:text-white">GitHub</a>
+        <a href="https://github.com/koushik018/omni-seo-studio/blob/main/PORTABLE.md" class="hover:text-white">Portability Guide</a>
+        <a href="https://github.com/koushik018/omni-seo-studio/blob/main/3D_WEBSITES_SEO.md" class="hover:text-white">3D SEO</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
