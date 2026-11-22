@@ -45,6 +45,18 @@ details{border:1px solid var(--line);border-radius:12px;padding:6px 18px;margin:
 summary{cursor:pointer;font-weight:600;min-height:48px;display:flex;align-items:center}details p{margin:0 0 14px;color:var(--mute)}
 footer{border-top:1px solid var(--line);margin-top:96px;padding-top:24px;padding-bottom:48px;color:var(--mute);font-size:16px}
 code{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:16px}
+
+.check{margin:56px 0 0}.check .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px}
+.check label{display:block;font-weight:600;margin:0 0 6px}
+.check input{font:inherit;width:100%;padding:15px 16px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);min-height:52px}
+.check input:focus,.check button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.check button.btn{border:0;cursor:pointer;margin-top:12px;font-family:inherit}.check button:disabled{opacity:.6;cursor:wait}
+.track{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:16px}.track i{display:block;height:100%;width:6%;background:var(--accent);transition:width .5s}
+#cstatus{margin:10px 0 0;color:var(--mute)}.cerr{color:#d93025;font-weight:600}
+.sc{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-top:22px}
+.sc .n{font-size:64px;font-weight:800;line-height:1}.sc .v{font-size:24px;font-weight:700}
+.fx{border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;padding:14px 16px;margin:12px 0;background:var(--bg)}
+.fx h3{margin:0 0 4px;font-size:18px}.fx p{margin:4px 0;color:var(--mute);font-size:16px}.fx.critical{border-left-color:#d93025}.fx.high{border-left-color:#e8710a}.fx.medium{border-left-color:#f2b600}
 </style>
 </head>
 <body>
@@ -60,13 +72,26 @@ code{background:var(--panel);border:1px solid var(--line);border-radius:6px;padd
 <h1>Is your website easy for Google and AI to read?</h1>
 <p class="lead">Type an address. Get a score, what is wrong, and how to fix it.</p>
 <div class="row">
-<a class="btn" href="#install"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>How to get it</a>
+<a class="btn" href="#check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>Check my website</a>
 <a class="btn line" href="#faq">Quick answers</a>
 </div>
 <p class="small">Needs a Windows, Mac or Linux computer. Runs on your computer; nothing you check is sent to anyone.</p>
 </div>
 <img class="shot" src="images/report.jpg" width="1440" height="1120" alt="An OmniSEO report: a score of 31 out of 100 for a sample site, how many checks failed, and the first fix with the reason and how to fix it">
 </div>
+
+<section class="check" id="check">
+<div class="center"><h2>Check your website now</h2><p class="sub">Type an address. It takes about a minute.</p></div>
+<form class="card" id="cf" autocomplete="off">
+<label for="curl">Website address</label>
+<input id="curl" placeholder="https://yourwebsite.com" required inputmode="url" autocapitalize="off" spellcheck="false">
+<button class="btn" id="cgo" type="submit">Check this website</button>
+<div class="track" id="ctrack" hidden><i id="cbar"></i></div>
+<p id="cstatus" role="status" aria-live="polite"></p>
+<div id="cout"></div>
+<p class="small">It only reads the site, the way a search engine does, and reads up to 60 pages. The first check after a quiet spell can take up to a minute to wake up.</p>
+</form>
+</section>
 
 <section id="install">
 <div class="center"><h2>Install in 3 steps</h2><p class="sub">About five minutes, the first time. No account needed.</p></div>
@@ -111,5 +136,41 @@ code{background:var(--panel);border:1px solid var(--line);border-radius:6px;padd
 <footer>
 <p>OmniSEO is free to use. The license that comes with it says what you may and may not do (all rights reserved).</p>
 </footer>
+<script>
+(function(){
+var API='https://omni-seo-studio.onrender.com';
+try{var o=new URLSearchParams(location.search).get('api');if(o&&/^(localhost|127\.0\.0\.1)$/.test(location.hostname))API=o}catch(e){}
+var $=function(i){return document.getElementById(i)},esc=function(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var W={critical:'Fix now',high:'Important',medium:'Worth fixing',low:'Small thing'};
+function verdict(n){return n>=90?'Looking good':n>=70?'Mostly fine, a few fixes will help':n>=50?'Needs some work':'Needs attention'}
+$('cf').addEventListener('submit',async function(ev){
+ ev.preventDefault();var u=$('curl').value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;
+ var go=$('cgo');go.disabled=true;go.textContent='Checking...';$('cout').innerHTML='';$('ctrack').hidden=false;$('cbar').style.width='6%';
+ var st=$('cstatus');st.className='';st.textContent='Waking the checker. The first check can take up to a minute...';
+ try{
+  var r=await fetch(API+'/api/v2/site-audit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:u,max_pages:60})});
+  var j=await r.json();if(!r.ok||!j.success)throw new Error(j.error||j.detail||(r.status===429?'Too many checks right now. Wait a minute and try again.':'Something went wrong. Try again.'));
+  for(;;){
+   await new Promise(function(x){setTimeout(x,1500)});
+   var s=await(await fetch(API+j.status_url)).json(),p=s.progress||{};
+   st.textContent='Working: '+(p.stage||s.status)+(p.total>1?' ('+p.done+' of '+p.total+')':'');
+   $('cbar').style.width=(p.total>1?Math.max(8,Math.round(100*p.done/p.total)):12)+'%';
+   if(s.status==='failed')throw new Error(s.error||'The check failed. Is the address right and the site online?');
+   if(s.status==='done'){show(s.result,j.job_id);break}
+  }
+ }catch(e){st.className='cerr';st.textContent=(e instanceof TypeError)?'Could not reach the checker. Try again in a minute.':e.message}
+ $('ctrack').hidden=true;go.disabled=false;go.textContent='Check this website';
+});
+function show(rep,id){
+ var s=rep.summary,h='<div class="sc"><div class="n">'+s.score+'</div><div><div class="v">'+verdict(s.score)+'</div><div class="small" style="margin:0">out of 100 &middot; '+s.rules_failed+' problems &middot; '+s.rules_passed+' passed</div></div></div>';
+ var plan=(rep.plan||[]).filter(function(p){return p.kind==='on-site'}).slice(0,5);
+ if(plan.length){h+='<h3 style="margin:24px 0 4px">Fix first</h3>';plan.forEach(function(p){h+='<div class="fx '+esc(p.severity)+'"><h3>'+esc(p.title)+'</h3><p><b>Why:</b> '+esc(p.why)+'</p><p><b>Fix:</b> '+esc(p.how)+'</p></div>'})}
+ else h+='<p style="color:#188038;font-weight:700">Nothing needs fixing.</p>';
+ h+='<p><a class="btn" target="_blank" rel="noopener" href="'+API+'/api/v2/jobs/'+id+'/report.html">Open the full report</a></p>';
+ $('cstatus').textContent='Done: '+s.pages_ok+(s.pages_ok===1?' page':' pages')+' read.';
+ $('cout').innerHTML=h;
+}
+})();
+</script>
 </body>
 </html>
