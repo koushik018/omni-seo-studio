@@ -162,6 +162,11 @@ $('cf').addEventListener('submit',async function(ev){
  $('ctrack').hidden=true;go.disabled=false;go.textContent='Check this website';
 });
 function show(rep,id){
+ if(rep.summary.status==='unreachable'){
+  var m=((rep.rules.find(function(r){return r.id==='P9'})||{}).affected||[{}])[0].message||'';
+  $('cstatus').textContent='Nothing could be read.';
+  $('cout').innerHTML='<h3 style="margin:22px 0 6px">This site could not be read</h3><p>'+esc(m)+'</p><p><b>This is not a score.</b> A site that answers 403 or shows a firewall page is usually blocking automatic visitors, so nothing could be checked. It does not mean the site is broken for real visitors. Try again later, check the address, or run the checker on your own computer.</p>';
+  return}
  var s=rep.summary,h='<div class="sc"><div class="n">'+s.score+'</div><div><div class="v">'+verdict(s.score)+'</div><div class="small" style="margin:0">out of 100 &middot; '+s.rules_failed+' problems &middot; '+s.rules_passed+' passed</div></div></div>';
  var plan=(rep.plan||[]).filter(function(p){return p.kind==='on-site'}).slice(0,5);
  if(plan.length){h+='<h3 style="margin:24px 0 4px">Fix first</h3>';plan.forEach(function(p){h+='<div class="fx '+esc(p.severity)+'"><h3>'+esc(p.title)+'</h3><p><b>Why:</b> '+esc(p.why)+'</p><p><b>Fix:</b> '+esc(p.how)+'</p></div>'})}
